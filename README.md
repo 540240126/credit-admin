@@ -1,0 +1,1 @@
+# 使用electron-packager打包, 打包后将package/xxx/resources/electronIndex.js改名为 index.js即可，打包后手动将package/xxx/resources/node_modules文件夹删除一下(不知道为啥electron-packager --ignore为啥对node_modules无效...)
