@@ -46,7 +46,9 @@ export default {
     name: '维士顿',
     BankData: {
       name: '银行卡三要素验证',
-      data: require('./config/wsdinter/BankData').default
+      data: {
+        result: '返回结果'
+      }
     },
     PhoneData: {
       name: '手机号验证',
@@ -63,28 +65,19 @@ export default {
       name: '手机号在网状态验证',
       data: {
         state: '时长',
-        statcode: {
-          __name__: '查询结果',
-          0: '在网状态正常',
-          1: '在网状态停机',
-          2: '预销号',
-          3: '已销号/未启用',
-          4: '在网但不可用',
-          5: '号码状态有误',
-          6: '认证通过',
-          7: '认证未通过'
-        },
-        ispType: {
-          0: '中国移动',
-          1: '中国联通',
-          2: '中国电信'
-        },
+        statCode: '查询结果',
+        ispType: '运营商',
         phone: '手机号'
       }
     },
-    PLData: {
+    PLTData: {
       name: '手机在网时长验证',
-      data: {}
+      data: {
+        state: '时长',
+        statCode: '查询结果',
+        ispType: '运营商',
+        phone: '手机号'
+      }
     },
     PBData: {
       name: '个人不良记录',

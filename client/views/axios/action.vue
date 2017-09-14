@@ -1,7 +1,7 @@
 <template>
   <div class="tile is-ancestor">
     <div class="tile is-parent is-8">
-      <article class="tile is-child box" style="word-break: break-all">
+      <article class="tile is-child box" style="word-break: break-all; max-height: 400px; overflow-y: auto; min-height: 0">
       <p class="title control" :class="{'is-loading': isloading}">
         {{params.name}} 返回信息:
         <span class="subtitle help is-danger is-5">
@@ -101,14 +101,16 @@ import config from './config.js'
 
 const NotificationComponent = Vue.extend(Notification)
 
-const openNotification = (propsData = {
-  title: '',
-  message: '',
-  type: '',
-  direction: '',
-  duration: 4500,
-  container: '.notifications'
-}) => {
+const openNotification = (
+  propsData = {
+    title: '',
+    message: '',
+    type: '',
+    direction: '',
+    duration: 4500,
+    container: '.notifications'
+  }
+) => {
   return new NotificationComponent({
     el: document.createElement('div'),
     propsData
@@ -117,14 +119,16 @@ const openNotification = (propsData = {
 
 const MessageComponent = Vue.extend(Message)
 
-const openMessage = (propsData = {
-  title: '',
-  message: '',
-  type: '',
-  direction: '',
-  duration: 1500,
-  container: '.messages'
-}) => {
+const openMessage = (
+  propsData = {
+    title: '',
+    message: '',
+    type: '',
+    direction: '',
+    duration: 1500,
+    container: '.messages'
+  }
+) => {
   return new MessageComponent({
     el: document.createElement('div'),
     propsData
@@ -146,45 +150,74 @@ export default {
   },
   methods: {
     loadData () {
+      this.result = []
       this.isloading = true
       this.$http({
         url: `http://192.168.1.150:8080/zy-credit-app/${this.code}/${this.api}`,
         params: this.params
-      }).then((response) => {
-        console.log(response)
-        const data = response.data
-        this.isloading = false
-        window.Lockr.set('params', this.params)
-        if (data.code === '100010') {
-          return openMessage({
-            title: 'Warning',
-            message: '超出当天访问次数!',
-            type: 'warning'
-          })
-        }
-        openMessage({
-          title: 'Success',
-          message: '请求成功!',
-          type: 'success'
-        })
-        let arr = []
-        for (let i in data) {
-          const item = this.config[this.code][this.api].data[i]
-          if (!item) {
-            continue
-          }
-          arr.push({label: item, value: data[i]})
-        }
-        this.result = arr
-      }).catch((error) => {
-        this.isloading = false
-        openNotification({
-          title: 'Error',
-          message: '发生错误!',
-          type: 'danger'
-        })
-        console.log(error)
       })
+        .then(response => {
+          console.log(response)
+          let data = response.data
+          this.isloading = false
+          window.Lockr.set('params', this.params)
+          if (this.code === 'brAction' && data.code === '100010') {
+            return openMessage({
+              title: 'Warning',
+              message: '超出当天访问次数!',
+              type: 'warning'
+            })
+          }
+          if (this.code === 'wsdinter' && data.CODE !== '0' && data.CODE !== '200') {
+            return openMessage({
+              title: 'Warning',
+              message: data.MESSAGE,
+              type: 'warning'
+            })
+          }
+          openMessage({
+            title: 'Success',
+            message: '请求成功!',
+            type: 'success'
+          })
+          if (this.code === 'wsdinter') {
+            data = data.data || data.education || data.DATA
+            if (typeof data === 'string') {
+              data = {result: response.data.data}
+            }
+          }
+          // if (data instanceof 'Array') {
+          //   let _data = {}
+          //   data.forEach((item) => {
+          //     for (let i in item) {
+          //       _data[i] = item[i]
+          //     }
+          //   })
+          // }
+          let arr = []
+          for (let i in data) {
+            const item = this.config[this.code][this.api].data[i]
+            if (!item) {
+              arr.push({ label: i, value: data[i] })
+            } else {
+              if (typeof item === 'object') {
+                arr.push({ label: item.__name__, value: item[data[i]] })
+              } else {
+                arr.push({ label: item, value: data[i] })
+              }
+            }
+          }
+          this.result = arr
+        })
+        .catch(error => {
+          this.isloading = false
+          openNotification({
+            title: 'Error',
+            message: '发生错误!',
+            type: 'danger'
+          })
+          console.log(error)
+        })
     }
   }
 }
