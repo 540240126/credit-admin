@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
+import Lockr from 'lockr'
 import VueAxios from 'vue-axios'
 import VueAuth from '@websanova/vue-auth'
 import NProgress from 'vue-nprogress'
@@ -9,6 +10,8 @@ import router from './router'
 import store from './store'
 import * as filters from './filters'
 import { TOGGLE_SIDEBAR } from 'vuex-store/mutation-types'
+
+window.Lockr = Lockr
 
 Vue.router = router
 Vue.use(VueAxios, axios)
