@@ -161,10 +161,10 @@ export default {
           let data = response.data
           this.isloading = false
           window.Lockr.set('params', this.params)
-          if (this.code === 'brAction' && data.code === '100010') {
+          if (this.code === 'brAction' && (data.code === '100010' || data.code === '100002')) {
             return openMessage({
               title: 'Warning',
-              message: '超出当天访问次数!',
+              message: data.msg,
               type: 'warning'
             })
           }
@@ -181,9 +181,9 @@ export default {
             type: 'success'
           })
           if (this.code === 'wsdinter') {
-            data = data.data || data.education || data.DATA
-            if (typeof data === 'string') {
-              data = {result: response.data.data}
+            // data = data.data || data.education || data.DATA
+            if (typeof data.data === 'string') {
+              data = {result: data.data}
             }
           }
           // if (data instanceof 'Array') {
@@ -196,12 +196,19 @@ export default {
           // }
           let arr = []
           for (let i in data) {
+            const formatter = this.config[this.code][this.api].formatter
+            if (typeof formatter === 'function') {
+              const label = formatter.call(this.config[this.code][this.api], i, data[i])
+              if (!label) continue
+              arr.push({ label: label[0], value: label[1] })
+              continue
+            }
             const item = this.config[this.code][this.api].data[i]
             if (!item) {
-              arr.push({ label: i, value: data[i] })
+              // arr.push({ label: i, value: data[i] })
             } else {
               if (typeof item === 'object') {
-                arr.push({ label: item.__name__, value: item[data[i]] })
+                arr.push({ label: item.__name__, value: item[data[i]] ? item[data[i]] : data[i] })
               } else {
                 arr.push({ label: item, value: data[i] })
               }

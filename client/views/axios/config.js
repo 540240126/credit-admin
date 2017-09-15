@@ -3,11 +3,56 @@ export default {
     name: '百融',
     specialListc: {
       name: '特殊名单核查',
-      data: require('./config/brAction/specialListc').default
+      data: require('./config/brAction/specialListc').default,
+      formatter (key, value) {
+        const conf = {
+          cell: '手机号',
+          lm_cell: '联系人手机号',
+          id: '身份证号'
+        }
+        const vConf = {
+          '': '未命中',
+          '0': '本人直接命中',
+          '1': '一度关系命中',
+          '2': '二度关系命中'
+        }
+        let str = ''
+        const res = key.match(/^sl_(cell|lm_cell|id)_([a-z_]+)$/)
+        if (!res) {
+          return false
+        }
+        console.log(key, res, this.data)
+        str += '通过' + conf[res[1]] + this.data[res[2]]
+        return [str, vConf[value] ? vConf[value] : value]
+      }
     },
     applyLoanMon: {
       name: '多次申请核查—月度版',
-      data: require('./config/brAction/applyLoanMon').default
+      data: require('./config/brAction/applyLoanMon').default,
+      formatter (key, value) {
+        const conf = {
+          cell: '手机号',
+          lm_cell: '联系人手机号',
+          id: '身份证号'
+        }
+        const vConf = {
+          '': '无申请信息',
+          '0': '该分类无申请信息'
+        }
+        let str = ''
+        const res = key.match(/^alm_([a-z])(\d+)_(cell|lm_cell|id)_([a-z_]+)$/)
+        if (!res) {
+          return false
+        }
+        console.log(key, res)
+        if (res[1] === 'd') {
+          str += `近${res[2]}天内, `
+        } else {
+          str += `过去第${res[2]}个月, `
+        }
+        str += '按' + conf[res[3]] + this.data[res[4]]
+        return [str, vConf[value] ? vConf[value] : `申请了 ${value} 次`]
+      }
     },
     inforelation: {
       name: '申请信息关联',
