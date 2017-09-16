@@ -145,7 +145,13 @@ export default {
     },
     PJudicial: {
       name: '个人司法验证',
-      data: {}
+      data: {
+        entryId: '裁判文书ID',
+        body: '内容',
+        title: '标题',
+        sortTime: '审结时间',
+        dataType: '公告类型'
+      }
     },
     OPlatInfo: {
       name: '贷款逾期查询',
@@ -197,6 +203,65 @@ export default {
         specialityname: '专业',
         studyresult: '毕业结论',
         studystyle: '学历类型'
+      }
+    },
+    CheckDriverState: {
+      name: '驾驶证查询状态接口',
+      data: {
+        ztDescript: '状态'
+      }
+    },
+    QPIdentity: {
+      name: '个人风控反欺诈',
+      data: {
+        mcSaddInfoList: [
+          {
+            datebSadd: '同住址成员出生日期',
+            nameSadd: '同住址成员姓名',
+            natSadd: '同住址成员民族',
+            sexSadd: '同住址成员性别',
+            fkResultId: '同住址成员信息ID'
+          }
+        ],
+        resultInfo: {
+          identId: '身份证号',
+          nameUsd: '姓名',
+          statId: '曾用名',
+          sex: '性别',
+          nat: '民族',
+          dateBirth: '出生日期',
+          emp: '工作单位',
+          educa: '学历',
+          statMa: '婚姻状况',
+          addHr: '户籍地址',
+          disHr: '户籍所属区',
+          np: '籍贯',
+          ifAl: '是否在逃',
+          ifcd: '是否违法犯罪和吸毒',
+          iff: '是否欺诈',
+          ifOc: '是否失联',
+          ifOd: '曾经是否逾期',
+          ifOdn: '当前是否逾期'
+        }
+      }
+    },
+    CheckStree: {
+      name: '行驶证五要素验证',
+      data: {
+        syr: '所有人匹配结果',
+        sfxh: '身份证匹配结果',
+        hphm: '车牌号匹配结果',
+        hpxl: '号牌种类匹配结果',
+        clsbdh6: '车架号匹配结果'
+      }
+    },
+    CheckDriverInfo: {
+      name: '驾驶证五要素验证',
+      data: {
+        jszh: '驾驶证号匹配结果',
+        xm: '姓名匹配结果',
+        zjcx: '档案编号匹配结果',
+        cclzrq: '初次领证日期匹配结果'
       }
     }
   }

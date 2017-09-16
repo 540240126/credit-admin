@@ -2,7 +2,7 @@
   <div class="tile is-ancestor" style="height: 100%;margin-right: 5px">
     <div class="tile is-parent is-10" style="flex: 1;width: 100%;">
       <article class="tile is-child box"
-               style="word-break: break-all; overflow-y: auto; min-height: 350px">
+               style="word-break: break-all; overflow-y: auto; min-height: 450px">
         <p class="title control" :class="{'is-loading': isloading}">
           {{params.name}} 返回信息:
           <span class="subtitle help is-danger is-5">
@@ -203,18 +203,25 @@ export default {
           })
           if (code === 'wsdinter') {
             // data = data.data || data.education || data.DATA
-            if (typeof data.data === 'string') {
-              data = {result: data.data}
+            const _data = data.data || data.judicialList
+            if (typeof _data === 'string') {
+              try {
+                data = JSON.parse(_data)
+              } catch (e) {
+                data = {result: _data}
+              }
             }
           }
-          // if (data instanceof 'Array') {
-          //   let _data = {}
-          //   data.forEach((item) => {
-          //     for (let i in item) {
-          //       _data[i] = item[i]
-          //     }
-          //   })
-          // }
+          console.log(data)
+          if (data instanceof Array) {
+            let _data = {}
+            data.forEach((item) => {
+              for (let i in item) {
+                _data[i] = item[i]
+              }
+            })
+            data = _data
+          }
           let arr = []
           for (let i in data) {
             // console.log(i, data[i], code, api)
@@ -227,7 +234,7 @@ export default {
             }
             const item = this.config[code][api].data[i]
             if (!item) {
-              arr.push({ label: i, value: data[i] })
+              // arr.push({ label: i, value: data[i] })
             } else {
               if (typeof item === 'object') {
                 arr.push({ label: item.__name__, value: item[data[i]] ? item[data[i]] : data[i] })

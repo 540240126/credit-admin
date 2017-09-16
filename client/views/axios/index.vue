@@ -58,6 +58,42 @@
         </div>
       </div>
     </article>
+    <article
+      class="tile is-child box"
+      style="display: flex;word-break: break-all; overflow-y: auto; flex: 1 1 100%;margin-bottom: 10px !important">
+      <div class="control is-horizontal">
+        <div class="control-label">
+          <label class="label">驾驶证号</label>
+        </div>
+        <div class="control is-fullwidth">
+          <input class="input" type="text" v-model="params.drivercard">
+        </div>
+      </div>
+      <div class="control is-horizontal">
+        <div class="control-label">
+          <label class="label">初次领证日期</label>
+        </div>
+        <div class="control is-fullwidth">
+          <input class="input" type="text" v-model="params.drivertime">
+        </div>
+      </div>
+      <div class="control is-horizontal">
+        <div class="control-label">
+          <label class="label">档案单号</label>
+        </div>
+        <div class="control is-fullwidth">
+          <input class="input" type="text" v-model="params.driverdabh">
+        </div>
+      </div>
+      <div class="control is-horizontal">
+        <div class="control-label">
+          <label class="label">准驾车型</label>
+        </div>
+        <div class="control is-fullwidth">
+          <input class="input" type="text" v-model="params.driverzjcx">
+        </div>
+      </div>
+    </article>
     <action
       ref="brAction"
       code="brAction"
@@ -115,7 +151,11 @@ export default {
         name: null,
         idcard: null,
         accountId: null,
-        bankid: null
+        bankid: null,
+        drivercard: null,
+        drivertime: null,
+        driverdabh: null,
+        driverzjcx: null
       },
       selectUser: '',
       result: [],
