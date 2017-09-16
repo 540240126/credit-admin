@@ -1,35 +1,50 @@
 <template>
-  <div class="tile is-ancestor">
-    <div class="tile is-parent is-8">
-      <article class="tile is-child box" style="word-break: break-all; max-height: 400px; overflow-y: auto; min-height: 0">
-      <p class="title control" :class="{'is-loading': isloading}">
-        {{params.name}} 返回信息:
-        <span class="subtitle help is-danger is-5">
-          {{name}}
-        </span>
-      </p>
-      <table class="table is-striped">
-        <thead>
-          <tr>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in result" :key="index">
-            <td>
-              <a>{{item.label}}</a>
-            </td>
-            <td>
-              {{item.value}}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- <chart :type="'line'" :data="stockData" :options="options"></chart> -->
-    </article>
+  <div class="tile is-ancestor" style="height: 100%;margin-right: 5px">
+    <div class="tile is-parent is-10" style="flex: 1;width: 100%;">
+      <article class="tile is-child box"
+               style="word-break: break-all; overflow-y: auto; min-height: 350px">
+        <p class="title control" :class="{'is-loading': isloading}">
+          {{params.name}} 返回信息:
+          <span class="subtitle help is-danger is-5">
+            {{name}}
+          </span>
+        </p>
+        <div v-for="i in result">
+          <p>{{config[code][i.name].name}}</p>
+          <table class="table is-striped">
+            <thead>
+              <tr>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in i.data" :key="index">
+                <td>
+                  <a>{{item.label}}</a>
+                </td>
+                <td>
+                  {{item.value}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- <chart :type="'line'" :data="stockData" :options="options"></chart> -->
+      </article>
+      <article class="tile is-child box" style="flex: 0 0 auto">
+        <ul>
+          <li
+            v-for="i in options"
+            :key="i"
+            style="user-select: none;">
+            <input type="checkbox" :name="this.code" v-model="checked" :value="i" :id="i">
+            <label :for="i" style="font-size: 16px; margin-right: 8px">{{config[code][i].name}}</label>
+          </li>
+        </ul>
+      </article>
     </div>
-    <div class="tile is-parent is-4">
+    <!-- <div class="tile is-parent is-4">
       <article class="tile is-child box">
         <div class="block">
           <p class="title is-5">请求参数</p>
@@ -88,7 +103,7 @@
           </div>
         </div>
       </article>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -141,7 +156,8 @@ export default {
     return {
       api: this.options[0],
       result: [],
-      isloading: false
+      isloading: false,
+      checked: this.options
     }
   },
   computed: {},
@@ -149,11 +165,16 @@ export default {
     this.config = config
   },
   methods: {
-    loadData () {
+    loadAll () {
+      this.result = []
+      this.checked.forEach((item) => this.loadData(item))
+    },
+    loadData (api) {
+      const code = this.code
       this.result = []
       this.isloading = true
       this.$http({
-        url: `http://192.168.1.150:8080/zy-credit-app/${this.code}/${this.api}`,
+        url: `http://192.168.1.150:8080/zy-credit-app/${code}/${api}`,
         params: this.params
       })
         .then(response => {
@@ -161,14 +182,14 @@ export default {
           let data = response.data
           this.isloading = false
           window.Lockr.set('params', this.params)
-          if (this.code === 'brAction' && (data.code === '100010' || data.code === '100002')) {
+          if (code === 'brAction' && (data.code === '100010' || data.code === '100002')) {
             return openMessage({
               title: 'Warning',
               message: data.msg,
               type: 'warning'
             })
           }
-          if (this.code === 'wsdinter' && data.CODE !== '0' && data.CODE !== '200') {
+          if (code === 'wsdinter' && data.CODE !== '0' && data.CODE !== '200') {
             return openMessage({
               title: 'Warning',
               message: data.MESSAGE,
@@ -180,7 +201,7 @@ export default {
             message: '请求成功!',
             type: 'success'
           })
-          if (this.code === 'wsdinter') {
+          if (code === 'wsdinter') {
             // data = data.data || data.education || data.DATA
             if (typeof data.data === 'string') {
               data = {result: data.data}
@@ -196,16 +217,17 @@ export default {
           // }
           let arr = []
           for (let i in data) {
-            const formatter = this.config[this.code][this.api].formatter
+            // console.log(i, data[i], code, api)
+            const formatter = this.config[code][api].formatter
             if (typeof formatter === 'function') {
-              const label = formatter.call(this.config[this.code][this.api], i, data[i])
+              const label = formatter.call(this.config[code][api], i, data[i])
               if (!label) continue
               arr.push({ label: label[0], value: label[1] })
               continue
             }
-            const item = this.config[this.code][this.api].data[i]
+            const item = this.config[code][api].data[i]
             if (!item) {
-              // arr.push({ label: i, value: data[i] })
+              arr.push({ label: i, value: data[i] })
             } else {
               if (typeof item === 'object') {
                 arr.push({ label: item.__name__, value: item[data[i]] ? item[data[i]] : data[i] })
@@ -214,7 +236,7 @@ export default {
               }
             }
           }
-          this.result = arr
+          this.result.push({name: api, data: arr})
         })
         .catch(error => {
           this.isloading = false

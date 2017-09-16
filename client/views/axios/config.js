@@ -21,7 +21,7 @@ export default {
         if (!res) {
           return false
         }
-        console.log(key, res, this.data)
+        // console.log(key, res, this.data)
         str += '通过' + conf[res[1]] + this.data[res[2]]
         return [str, vConf[value] ? vConf[value] : value]
       }
@@ -44,7 +44,7 @@ export default {
         if (!res) {
           return false
         }
-        console.log(key, res)
+        // console.log(key, res)
         if (res[1] === 'd') {
           str += `近${res[2]}天内, `
         } else {
